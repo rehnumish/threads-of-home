@@ -127,7 +127,7 @@ class FoodChallenge:
             {
                 "heading": "A Meal Has Balance",
                 "body": (
-                    "A Bangladeshi meal is not only one food. Bhaat gives the meal its base. Fish adds "
+                    "A Bangladeshi meal is not only one food. Bhaat (rice) gives the meal its base. Fish adds "
                     "the main flavour and connects the meal to rivers and daily life. Achar adds a strong "
                     "sour, spicy, or tangy taste. Each item has a different job on the plate."
                 ),
@@ -135,9 +135,9 @@ class FoodChallenge:
             {
                 "heading": "Mishti and Pitha",
                 "body": (
-                    "Mishti is connected with happiness. Families express enjoyment, hospitality, and "
-                    "festivities with mishti. Pitha is often connected with home, seasons, and family "
-                    "gatherings. These foods carry memories because people remember who made them, "
+                    "Mishti is a bengali traditional sweet connected with happiness. Families express enjoyment, "
+                     "hospitality, and festivities with mishti. Pitha, another sweet snack, is often connected with home, "
+                    "seasons, and family gatherings. These foods carry memories because people remember who made them, "
                     "when they ate them, and who they shared them with."
                 ),
             },

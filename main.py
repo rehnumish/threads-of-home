@@ -27,12 +27,12 @@ def create_fonts():
         return pygame.font.SysFont("arial", size, bold=bold, italic=italic)
 
     return {
-        "title": choose_font(["Gabriola", "Palatino Linotype", "Book Antiqua", "Georgia"], 58, bold=True),
-        "heading": choose_font(["Palatino Linotype", "Book Antiqua", "Georgia"], 36, bold=True),
-        "map_label": choose_font(["Palatino Linotype", "Book Antiqua", "Georgia"], 28, bold=True),
-        "body": choose_font(["Cambria", "Trebuchet MS", "Arial"], 24),
-        "small": choose_font(["Cambria", "Trebuchet MS", "Arial"], 18),
-        "tiny": choose_font(["Cambria", "Trebuchet MS", "Arial"], 15),
+        "title": choose_font(["Georgia", "Palatino Linotype", "Book Antiqua", "Cambria"], 54, bold=True),
+        "heading": choose_font(["Georgia", "Palatino Linotype", "Book Antiqua", "Cambria"], 34, bold=True),
+        "map_label": choose_font(["Georgia", "Palatino Linotype", "Book Antiqua", "Cambria"], 28, bold=True),
+        "body": choose_font(["Georgia", "Cambria", "Trebuchet MS", "Arial"], 24),
+        "small": choose_font(["Georgia", "Cambria", "Trebuchet MS", "Arial"], 18),
+        "tiny": choose_font(["Georgia", "Cambria", "Trebuchet MS", "Arial"], 15),
     }
 
 
@@ -141,22 +141,27 @@ def main():
                         current_state = MAP
 
                 elif current_state == MAP:
-                    if buttons["festival"].collidepoint(mouse_pos):
-                        festival_challenge.reset()
-                        current_state = FESTIVAL
-                    elif buttons["food"].collidepoint(mouse_pos):
-                        food_challenge.reset()
-                        current_state = FOOD
-                    elif buttons["river"].collidepoint(mouse_pos):
-                        current_state = RIVER
-                    elif buttons["rhythm"].collidepoint(mouse_pos):
-                        current_state = RHYTHM
-                    elif buttons["symbols"].collidepoint(mouse_pos):
-                         current_state = SYMBOLS
-                    elif buttons["quilt"].collidepoint(mouse_pos):
-                        current_state = QUILT
-                    elif buttons["final"] is not None and buttons["final"].collidepoint(mouse_pos):
+                    if buttons["final"] is not None and buttons["final"].collidepoint(mouse_pos):
                         current_state = FINAL
+                    else:
+                        clicked = buttons["_hit_test"](mouse_pos)
+
+                        if clicked == "festival":
+                            festival_challenge.reset()
+                            current_state = FESTIVAL
+                        elif clicked == "food":
+                            food_challenge.reset()
+                            current_state = FOOD
+                        elif clicked == "river":
+                            current_state = RIVER
+                        elif clicked == "rhythm":
+                            current_state = RHYTHM
+                        elif clicked == "symbols":
+                            current_state = SYMBOLS
+                        elif clicked == "quilt":
+                            current_state = QUILT
+                        elif buttons["final"] is not None and buttons["final"].collidepoint(mouse_pos):
+                            current_state = FINAL
 
                 elif current_state == FESTIVAL:
                     result = festival_challenge.handle_click(mouse_pos, buttons)
