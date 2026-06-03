@@ -48,15 +48,15 @@ def draw_map(screen, fonts, patches):
     draw_text(screen, "Choose a Cultural Challenge", fonts["title"], DARK, 500, 70, center=True)
 
     festival_button = draw_button(screen, "Pohela Boishakh Prep", fonts["body"], 120, 170, 320, 70, RED, WHITE)
-    food_button = draw_button(screen, "Serve the Family", fonts["body"], 560, 170, 320, 70, YELLOW)
+    food_button = draw_button(screen, "Food", fonts["body"], 560, 170, 320, 70, YELLOW)
     river_button = draw_button(screen, "River Journey", fonts["body"], 120, 290, 320, 70, BLUE, WHITE)
     rhythm_button = draw_button(screen, "Village Rhythm", fonts["body"], 560, 290, 320, 70, PURPLE, WHITE)
     symbols_button = draw_button(screen, "Symbols of Bangladesh", fonts["body"], 340, 400, 320, 70, GREEN, WHITE)
     
-    quilt_button = draw_button(screen, "View Nokshi Katha", fonts["body"], 340, 430, 320, 70, LIGHT_BROWN)
+    quilt_button = draw_button(screen, "View Nokshi Katha", fonts["body"], 340, 490, 320, 70, LIGHT_BROWN)
 
     completed = sum(1 for value in patches.values() if value)
-    draw_text(screen, f"Sections revealed: {completed} / 4", fonts["body"], DARK, 500, 535, center=True)
+    draw_text(screen, f"Sections revealed: {completed} / 5", fonts["body"], DARK, 500, 585, center=True)
 
     final_button = None
     if all(patches.values()):

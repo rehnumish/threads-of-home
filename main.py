@@ -11,16 +11,28 @@ from quilt import update_reveal_progress
 from screens import draw_menu, draw_intro, draw_map, draw_quilt_screen, draw_final_screen
 from challenges.festival import FestivalChallenge
 from challenges.placeholder import draw_placeholder_challenge
-
+from challenges.food import FoodChallenge
 
 def create_fonts():
     """Create and return all fonts used by the game."""
+
+    def choose_font(candidates, size, bold=False, italic=False):
+        available = {name.lower().replace(" ", "") for name in pygame.font.get_fonts()}
+
+        for name in candidates:
+            key = name.lower().replace(" ", "")
+            if key in available:
+                return pygame.font.SysFont(name, size, bold=bold, italic=italic)
+
+        return pygame.font.SysFont("arial", size, bold=bold, italic=italic)
+
     return {
-        "title": pygame.font.SysFont("arial", 52, bold=True),
-        "heading": pygame.font.SysFont("arial", 34, bold=True),
-        "body": pygame.font.SysFont("arial", 24),
-        "small": pygame.font.SysFont("arial", 18),
-        "tiny": pygame.font.SysFont("arial", 15),
+        "title": choose_font(["Gabriola", "Palatino Linotype", "Book Antiqua", "Georgia"], 58, bold=True),
+        "heading": choose_font(["Palatino Linotype", "Book Antiqua", "Georgia"], 36, bold=True),
+        "map_label": choose_font(["Palatino Linotype", "Book Antiqua", "Georgia"], 28, bold=True),
+        "body": choose_font(["Cambria", "Trebuchet MS", "Arial"], 24),
+        "small": choose_font(["Cambria", "Trebuchet MS", "Arial"], 18),
+        "tiny": choose_font(["Cambria", "Trebuchet MS", "Arial"], 15),
     }
 
 
@@ -53,7 +65,7 @@ def main():
     }
 
     festival_challenge = FestivalChallenge()
-
+    food_challenge = FoodChallenge()
     buttons = {}
     running = True
 
@@ -75,12 +87,8 @@ def main():
             buttons = festival_challenge.draw(screen, fonts)
 
         elif current_state == FOOD:
-            buttons = draw_placeholder_challenge(
-                screen,
-                fonts,
-                "Serve the Family",
-                "Build a traditional meal and explore food as family memory.",
-            )
+             food_challenge.update()
+             buttons = food_challenge.draw(screen, fonts)
 
         elif current_state == RIVER:
             buttons = draw_placeholder_challenge(
@@ -137,6 +145,7 @@ def main():
                         festival_challenge.reset()
                         current_state = FESTIVAL
                     elif buttons["food"].collidepoint(mouse_pos):
+                        food_challenge.reset()
                         current_state = FOOD
                     elif buttons["river"].collidepoint(mouse_pos):
                         current_state = RIVER
@@ -158,17 +167,23 @@ def main():
                         reveal_progress["festival"] = 0.0
                         current_state = QUILT
 
-                elif current_state in [FOOD, RIVER, RHYTHM, SYMBOLS]:
+                elif current_state == FOOD:
+                    result = food_challenge.handle_click(mouse_pos, buttons)
+                    if result == "back":
+                        current_state = MAP
+                    elif result == "complete":
+                        patches["food"] = True
+                        reveal_progress["food"] = 0.0
+                        current_state = QUILT
+
+                elif current_state in [RIVER, RHYTHM, SYMBOLS]:
                     if buttons["complete"].collidepoint(mouse_pos):
-                        if current_state == FOOD:
-                            key = "food"
-                        elif current_state == RIVER:
+                        if current_state == RIVER:
                             key = "river"
                         elif current_state == RHYTHM:
                             key = "rhythm"
                         else:
                             key = "symbols"
-                        
 
                         patches[key] = True
                         reveal_progress[key] = 0.0

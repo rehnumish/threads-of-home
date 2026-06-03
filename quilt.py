@@ -12,28 +12,28 @@ from ui import draw_text
 SECTION_CONFIG = {
     "festival": {
         "file": "top_left.png",
-        "rect": pygame.Rect(190, 0, 190, 380),
+        "rect": pygame.Rect(0, 0, 190, 190),
         "label": "Festival",
     },
     "river": {
         "file": "bottom_left.png",
-        "rect": pygame.Rect(0, 0, 190, 190),
-        "label": "River",
-    },
-    "rhythm": {
-        "file": "bottom_right.png",
-        "rect": pygame.Rect(380, 0, 190, 190),
-        "label": "Rhythm",
-    },
-    "food": {
-        "file": "top_right.png",
         "rect": pygame.Rect(0, 190, 190, 190),
-        "label": "Food",
+        "label": "River",
     },
     "symbols": {
         "file": "center_tall.png",
-        "rect": pygame.Rect(380, 190, 190, 190),
+        "rect": pygame.Rect(190, 0, 190, 380),
         "label": "Symbols",
+    },
+    "food": {
+        "file": "top_right.png",
+        "rect": pygame.Rect(380, 0, 190, 190),
+        "label": "Food",
+    },
+    "rhythm": {
+        "file": "bottom_right.png",
+        "rect": pygame.Rect(380, 190, 190, 190),
+        "label": "Rhythm",
     },
 }
 
