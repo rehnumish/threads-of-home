@@ -14,6 +14,7 @@ from challenges.placeholder import draw_placeholder_challenge
 from challenges.food import FoodChallenge
 from challenges.river import RiverChallenge
 from challenges.rhythm import RhythmChallenge
+from challenges.symbols import SymbolsChallenge
 
 def create_fonts():
     """Create and return all fonts used by the game."""
@@ -70,6 +71,7 @@ def main():
     food_challenge = FoodChallenge()
     river_challenge = RiverChallenge()
     rhythm_challenge = RhythmChallenge()
+    symbols_challenge = SymbolsChallenge()
     buttons = {}
     running = True
 
@@ -104,12 +106,8 @@ def main():
             buttons = rhythm_challenge.draw(screen, fonts)
         
         elif current_state == SYMBOLS:
-            buttons = draw_placeholder_challenge(
-             screen,
-             fonts,
-            "Symbols of Bangladesh",
-            "Learn about the Shapla, Royal Bengal Tiger, and other national symbols.",
-            )
+            symbols_challenge.update()
+            buttons = symbols_challenge.draw(screen, fonts)
 
         elif current_state == QUILT:
             buttons = draw_quilt_screen(screen, fonts, patches, reveal_progress, animation_tick)
@@ -157,6 +155,7 @@ def main():
                             current_state = RHYTHM
                         elif clicked == "symbols":
                             current_state = SYMBOLS
+                            symbols_challenge.reset()
                         elif clicked == "quilt":
                             current_state = QUILT
                         elif buttons["final"] is not None and buttons["final"].collidepoint(mouse_pos):
@@ -200,13 +199,13 @@ def main():
                         reveal_progress["rhythm"] = 0.0
                         current_state = QUILT
 
-
-                elif current_state in [SYMBOLS]:
-                    if buttons["complete"].collidepoint(mouse_pos):
-                        key = "symbols"
-
-                        patches[key] = True
-                        reveal_progress[key] = 0.0
+                elif current_state == SYMBOLS:
+                    result = symbols_challenge.handle_click(mouse_pos, buttons)
+                    if result == "back":
+                        current_state = MAP
+                    elif result == "complete":
+                        patches["symbols"] = True
+                        reveal_progress["symbols"] = 0.0
                         current_state = QUILT
 
                     elif buttons["back"].collidepoint(mouse_pos):
