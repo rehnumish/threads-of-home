@@ -13,6 +13,7 @@ from challenges.festival import FestivalChallenge
 from challenges.placeholder import draw_placeholder_challenge
 from challenges.food import FoodChallenge
 from challenges.river import RiverChallenge
+from challenges.rhythm import RhythmChallenge
 
 def create_fonts():
     """Create and return all fonts used by the game."""
@@ -68,6 +69,7 @@ def main():
     festival_challenge = FestivalChallenge()
     food_challenge = FoodChallenge()
     river_challenge = RiverChallenge()
+    rhythm_challenge = RhythmChallenge()
     buttons = {}
     running = True
 
@@ -97,13 +99,9 @@ def main():
             buttons = river_challenge.draw(screen, fonts)
 
 
-        elif current_state == RHYTHM:
-            buttons = draw_placeholder_challenge(
-                screen,
-                fonts,
-                "Village Rhythm",
-                "Follow the rhythm of a village gathering and unlock a music section.",
-            )
+        elif current_state == RHYTHM:            
+            rhythm_challenge.update()
+            buttons = rhythm_challenge.draw(screen, fonts)
         
         elif current_state == SYMBOLS:
             buttons = draw_placeholder_challenge(
@@ -155,6 +153,7 @@ def main():
                             river_challenge.reset()
                             current_state = RIVER
                         elif clicked == "rhythm":
+                            rhythm_challenge.reset()
                             current_state = RHYTHM
                         elif clicked == "symbols":
                             current_state = SYMBOLS
@@ -192,12 +191,19 @@ def main():
                             reveal_progress["river"] = 0.0
                             current_state = QUILT
 
-                elif current_state in [RHYTHM, SYMBOLS]:
+                elif current_state == RHYTHM:
+                    result = rhythm_challenge.handle_click(mouse_pos, buttons)
+                    if result == "back":
+                        current_state = MAP
+                    elif result == "complete":
+                        patches["rhythm"] = True
+                        reveal_progress["rhythm"] = 0.0
+                        current_state = QUILT
+
+
+                elif current_state in [SYMBOLS]:
                     if buttons["complete"].collidepoint(mouse_pos):
-                        if current_state == RHYTHM:
-                            key = "rhythm"
-                        else:
-                            key = "symbols"
+                        key = "symbols"
 
                         patches[key] = True
                         reveal_progress[key] = 0.0
