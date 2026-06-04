@@ -37,3 +37,9 @@ challenges/
 ## Design idea
 
 The game uses a continuous Nokshi Katha as a visual progress system. Each completed cultural challenge reveals one section of the quilt. Unrevealed sections are covered by a soft blurred fabric overlay, symbolising memories that have not yet been rediscovered.
+
+## Credits
+
+Screens artwork: Suprito Saumik (supritosaumik1@gmail.com)
+
+Final quilt artwork: Renaissa Rahmat Ullah (renaissa.rahmat01@gmail.com)

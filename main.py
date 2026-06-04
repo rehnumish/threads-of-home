@@ -219,6 +219,17 @@ def main():
                     if buttons["back"].collidepoint(mouse_pos):
                         current_state = MAP
 
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+
+                if current_state == RIVER:
+                    result = river_challenge.handle_release(mouse_pos, buttons)
+
+                    if result == "complete":
+                        patches["river"] = True
+                        reveal_progress["river"] = 0.0
+                        current_state = QUILT
+
         update_reveal_progress(patches, reveal_progress)
 
         animation_tick += 1

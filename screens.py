@@ -382,9 +382,11 @@ def draw_quilt_screen(screen, fonts, patches, reveal_progress, animation_tick):
         if value:
             completed += 1
 
-    draw_text(screen, str(completed) + " of 5 memory sections revealed", fonts["body"], DARK, 500, 590, center=True)
+    draw_text(screen, str(completed) + " of 5 memory sections revealed", fonts["body"], DARK, 500, 575, center=True)
+    draw_text(screen, "Screens artwork: Suprito Saumik", fonts["tiny"], BROWN, 500, 600, center=True)
+    draw_text(screen, "Final quilt artwork: Renaissa Rahmat Ullah", fonts["tiny"], BROWN, 500, 620, center=True)
 
-    back_button = draw_button(screen, "Back to Map", fonts["body"], 390, 615, 220, 45, GREY)
+    back_button = draw_button(screen, "Back to Map", fonts["body"], 390, 640, 220, 45, GREY)
     return {"back": back_button}
 
 
@@ -398,7 +400,9 @@ def draw_final_screen(screen, fonts, patches, reveal_progress, animation_tick):
     draw_quilt(screen, 215, 130, 190, patches, reveal_progress, fonts, animation_tick)
 
     message = "Identity is stitched memory by memory, just like a Nokshi Katha."
-    draw_text(screen, message, fonts["body"], DARK, 500, 585, center=True)
+    draw_text(screen, message, fonts["small"], DARK, 500, 550, center=True)
+    draw_text(screen, "Screens artwork: Suprito Saumik", fonts["tiny"], BROWN, 500, 575, center=True)
+    draw_text(screen, "Final quilt artwork: Renaissa Rahmat Ullah", fonts["tiny"], BROWN, 500, 595, center=True)
 
     back_button = draw_button(screen, "Return to Map", fonts["body"], 390, 615, 220, 45, GREY)
     return {"back": back_button}
