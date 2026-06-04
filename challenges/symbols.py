@@ -1,94 +1,73 @@
-"""Symbols challenge for Threads of Home.
-
-This version uses separate quiz pages:
-- each page teaches one symbol
-- each page has multiple similar options
-- the player chooses the correct one
-"""
+"""Symbols challenge for Threads of Home."""
 
 import random
 import pygame
 
-from settings import CREAM, DARK, BROWN, WHITE, GREEN, YELLOW, GREY, DARK_GREY, ORANGE, RED, BLUE
-from ui import draw_text, draw_wrapped_text, draw_button
+from settings import CREAM, DARK, BROWN, WHITE, GREEN, YELLOW, GREY, DARK_GREY, ORANGE, RED
+from ui import draw_text, draw_button
 
 
-class SymbolsChallenge:
-    """Learn about symbols of Bangladesh through separate quiz pages."""
+LESSONS = [
+    {
+        "heading": "What Is a Symbol?",
+        "body": (
+            "A symbol is something small that can stand for a bigger idea. "
+            "A flower, animal, fish, flag, or bird can remind people of a country. "
+            "Symbols help people remember a place, even when they live far away from it."
+        ),
+    },
+    {
+        "heading": "National Flower",
+        "body": (
+            "The Shapla, or White Water Lily, is the national flower of Bangladesh. "
+            "It grows in ponds, lakes, and rivers. It shows purity, simplicity, and natural beauty."
+        ),
+    },
+    {
+        "heading": "National Animal",
+        "body": (
+            "The Royal Bengal Tiger is the national animal of Bangladesh. "
+            "It is connected with the Sundarbans and represents strength, courage, and pride."
+        ),
+    },
+    {
+        "heading": "National Fish",
+        "body": (
+            "The Hilsa, or Ilish, is the national fish of Bangladesh. "
+            "It is found in rivers like the Padma and Meghna and is loved by many Bangladeshi families."
+        ),
+    },
+    {
+        "heading": "National Bird",
+        "body": (
+            "The Doyel, or Oriental Magpie Robin, is the national bird of Bangladesh. "
+            "It is a small black and white bird known for its sweet song."
+        ),
+    },
+    {
+        "heading": "National Flag",
+        "body": (
+            "The flag of Bangladesh has a green background and a red circle. "
+            "The green shows the land and nature. The red circle shows the rising sun and the sacrifice "
+            "of people during the 1971 Liberation War."
+        ),
+    },
+    {
+        "heading": "Your Mission",
+        "body": (
+            "You will answer one quiz page at a time. "
+            "Choose the correct option to unlock that symbol on the board."
+        ),
+    },
+]
 
-    def __init__(self):
-        self.lesson_pages = [
-            {
-                "heading": "What Is a Symbol?",
-                "body": (
-                    "A symbol is something small that can stand for a bigger idea. "
-                    "A flower, animal, fish, flag, or map can remind people of a country. "
-                    "Symbols help people remember a place, even when they live far away from it."
-                ),
-            },
-            {
-                "heading": "National Flower",
-                "body": (
-                    "The Shapla, or White Water Lily, is the national flower of Bangladesh and can be seen floating beautifully on ponds, "
-                    "lakes, and rivers across the country. It blooms in water, which perfectly represents Bangladesh as a land of rivers and "
-                    "water bodies. The Shapla is a symbol of purity, simplicity, and natural beauty. It is even featured on the national emblem "
-                    "of Bangladesh, showing how important it is to the nation."
-                ),
-                },
-            {
-                "heading": "National Animal",
-                "body": (
-                    "The Royal Bengal Tiger is strongly connected with the Sundarbans. The Royal Bengal Tiger is the national animal of Bangladesh and "
-                    "is one of the most powerful and majestic animals in the world. It lives in the Sundarbans, the world's largest mangrove forest"
-                    " shared by Bangladesh and India. The tiger represents strength, courage, and pride, which are values the people of Bangladesh hold dear."
-                    " It is an endangered species, meaning there are very few left, so Bangladesh works hard to protect them. "
-                    
-                ),
-                },
-            {
-                "heading": "National Fish",
-                "body": (
-                    "The Hilsha, or Ilish, is the national fish of Bangladesh and is loved by almost every Bangladeshi family. It is found mainly in the rivers"
-                    " like the Padma and Meghna, and is famous for its delicious taste. Hilsha represents the river culture of Bangladesh, as the country is "
-                    "crisscrossed by hundreds of rivers. Every year, catching and eating Hilsha is a big part of festivals and daily life. "
-                ),
-               },
-            {
-                "heading": "National Bird",
-                "body": (
-                    "The Doyel, or Oriental Magpie Robin, is the national bird of Bangladesh and is known for its sweet and melodious singing. It is a small but"
-                    " beautiful black and white bird that can be found in gardens, parks, forests, and villages all across the country. The Doyel sings most"
-                    " beautifully in the early morning, and its cheerful song represents the joy and liveliness of the people of Bangladesh. It is so loved by the"
-                    " nation that it is featured on Bangladeshi currency notes. "
-                ),
-               },
 
-            {
-                "heading": "National Flag",
-                "body": (
-                    "A flag represents a country. "
-                    "The flag of Bangladesh has a green field referring to the natural greenery of this monsoon land and a red circle, "
-                    "referring to the the rising sun over Bengal, as well as the blood shed by the Bengalis who died fighting for the "
-                    "country's independence during the 1971 Liberation War. The red disc is deliberately placed slightly off-center (toward the pole side)."
-                ),
-               },
-            
-            {
-                "heading": "Your Mission",
-                "body": (
-                    "You will answer one quiz page at a time. "
-                    "Each page will teach you about one symbol, then give you several options. "
-                    "Choose the correct option to unlock that symbol on the board."
-                ),
-            },
-        ]
-
-        self.quiz_pages = [
+QUIZZES = [
     {
         "heading": "National Flower",
         "question": "Which one is Shapla, the national flower of Bangladesh?",
         "answer": "Waterlily",
-        "options": ["Marigold","Lotus", "Waterlily", "Rose", "Sunflower"],
+        "options": ["Marigold", "Lotus", "Waterlily", "Rose", "Sunflower"],
         "note": "Correct. Shapla is the national flower of Bangladesh.",
     },
     {
@@ -117,86 +96,196 @@ class SymbolsChallenge:
         "question": "Which option shows the national bird of Bangladesh?",
         "answer": "Doyel",
         "options": ["Kingfisher", "Doyel", "Asian Koel", "Myna", "Cockatoo"],
-        "note": "Correct. The map shows the shape and place of Bangladesh.",
+        "note": "Correct. Doyel is the national bird of Bangladesh.",
     },
 ]
 
+
+SYMBOL_LABELS = ["Shapla", "Tiger", "Hilsa", "Flag", "Bird"]
+
+
+OPTION_IMAGES = {
+    "Marigold": "Marigold.jpg",
+    "Lotus": "lotus.webp",
+    "Waterlily": "Waterlily.webp",
+    "Rose": "rose.jpeg",
+    "Sunflower": "sunflower.jpg",
+    "Elephant": "elephant.webp",
+    "Royal Bengal Tiger": "Tiger.jpg",
+    "Deer": "Deer.webp",
+    "Lion": "Lion.webp",
+    "Crocodile": "Crocodile.jpg",
+    "Rohu": "Rohu.jpg",
+    "Salmon": "Salmon.jpg",
+    "Anchovy": "Anchovy.jpg",
+    "Hilsa": "Hilsa.webp",
+    "Catfish": "Catfish.jpg",
+    "Bangladesh Flag": "Bangladesh_flag.jpg",
+    "Japan Flag": "Japan_flag.jpg",
+    "Pakistan Flag": "Pakistan_flag.jpg",
+    "India Flag": "India_flag.jpg",
+    "Nepal Flag": "Nepal_flag.jpg",
+    "Kingfisher": "Kingfisher.jpeg",
+    "Doyel": "Magpie_robin.jpg",
+    "Asian Koel": "Asian_koel.jpg",
+    "Myna": "Myna.jpg",
+    "Cockatoo": "Cockatoo.jpg",
+}
+
+
+IMAGE_CACHE = {}
+
+
+def draw_centered_words(screen, text, font, colour, center_x, y, max_width):
+    words = text.split()
+    line = ""
+
+    for word in words:
+        test_line = line + " " + word
+        test_line = test_line.strip()
+
+        if font.size(test_line)[0] <= max_width:
+            line = test_line
+        else:
+            draw_text(screen, line, font, colour, center_x, y, center=True)
+            y += font.get_height() + 8
+            line = word
+
+    if line != "":
+        draw_text(screen, line, font, colour, center_x, y, center=True)
+        y += font.get_height() + 8
+
+    return y
+
+
+def load_symbol_image(option_name, max_width, max_height):
+    filename = OPTION_IMAGES.get(option_name)
+
+    if filename is None:
+        return None
+
+    key = (filename, max_width, max_height)
+
+    if key in IMAGE_CACHE:
+        return IMAGE_CACHE[key]
+
+    try:
+        image = pygame.image.load("assets/symbols/" + filename).convert_alpha()
+        scale = min(max_width / image.get_width(), max_height / image.get_height())
+        new_width = int(image.get_width() * scale)
+        new_height = int(image.get_height() * scale)
+        image = pygame.transform.smoothscale(image, (new_width, new_height))
+        IMAGE_CACHE[key] = image
+        return image
+    except (pygame.error, FileNotFoundError):
+        return None
+
+
+def draw_symbol_board(screen, fonts, unlocked_count):
+    board = pygame.Rect(65, 105, 870, 90)
+    pygame.draw.rect(screen, (230, 244, 225), board, border_radius=18)
+    pygame.draw.rect(screen, DARK, board, width=3, border_radius=18)
+
+    for i in range(len(SYMBOL_LABELS)):
+        x = board.x + 95 + i * 170
+
+        if i < unlocked_count:
+            circle_colour = GREEN
+            label = SYMBOL_LABELS[i]
+        else:
+            circle_colour = (210, 210, 210)
+            label = "?"
+
+        pygame.draw.circle(screen, circle_colour, (x, board.y + 45), 30)
+        pygame.draw.circle(screen, DARK, (x, board.y + 45), 30, 2)
+        draw_text(screen, label, fonts["tiny"], DARK, x, board.y + 45, center=True)
+
+
+def draw_option_card(screen, fonts, option, rect):
+    mouse_pos = pygame.mouse.get_pos()
+
+    if rect.collidepoint(mouse_pos):
+        fill = (255, 245, 210)
+        outline = GREEN
+    else:
+        fill = WHITE
+        outline = DARK
+
+    pygame.draw.rect(screen, fill, rect, border_radius=16)
+    pygame.draw.rect(screen, outline, rect, width=3, border_radius=16)
+    draw_centered_words(screen, option, fonts["small"], DARK, rect.centerx, rect.y + 18, rect.width - 20)
+
+
+def draw_hover_photo(screen, fonts, option):
+    if option is None:
+        return
+
+    image = load_symbol_image(option, 200, 70)
+
+    if image is None:
+        return
+
+    preview = pygame.Rect(390, 515, 220, 90)
+    pygame.draw.rect(screen, WHITE, preview, border_radius=16)
+    pygame.draw.rect(screen, DARK, preview, width=3, border_radius=16)
+
+    image_rect = image.get_rect(center=preview.center)
+    screen.blit(image, image_rect)
+
+
+def draw_particles(screen, particles):
+    for particle in particles:
+        x = int(particle["x"])
+        y = int(particle["y"])
+        pygame.draw.circle(screen, particle["colour"], (x, y), 4)
+
+
+class SymbolsChallenge:
+    """Learn about symbols of Bangladesh."""
+
+    def __init__(self):
         self.reset()
 
     def reset(self):
         self.mode = "lesson"
         self.lesson_index = 0
-        self.current_quiz = 0
+        self.quiz_index = 0
+        self.unlocked_count = 0
         self.completed = False
-        self.message = self.lesson_pages[0]["body"]
-        self.success_particles = []
-        self.unlocked_symbols = []
         self.feedback = ""
+        self.particles = []
 
-    def update(self):
-        for p in self.success_particles:
-            p["x"] += p["dx"]
-            p["y"] += p["dy"]
-            p["dy"] += 0.12
-            p["life"] -= 1
-
-        self.success_particles = [p for p in self.success_particles if p["life"] > 0]
-
-    def add_success_particles(self, centre):
-        for _ in range(24):
-            self.success_particles.append({
-                "x": centre[0],
-                "y": centre[1],
+    def add_particles(self, center):
+        for i in range(24):
+            particle = {
+                "x": center[0],
+                "y": center[1],
                 "dx": random.uniform(-3, 3),
                 "dy": random.uniform(-4, -1),
                 "life": random.randint(24, 42),
                 "colour": random.choice([WHITE, GREEN, YELLOW, ORANGE, RED]),
-            })
+            }
+            self.particles.append(particle)
 
-    def draw_particles(self, screen):
-        for p in self.success_particles:
-            pygame.draw.circle(screen, p["colour"], (int(p["x"]), int(p["y"])), 4)
+    def update(self):
+        for particle in self.particles:
+            particle["x"] += particle["dx"]
+            particle["y"] += particle["dy"]
+            particle["dy"] += 0.12
+            particle["life"] -= 1
 
-    def draw_centered_wrapped_text(self, screen, text, font, colour, center_x, y, max_width, line_gap=8, paragraph_gap=14):
-        """Draw wrapped text centered line by line, supporting paragraph breaks."""
-        paragraphs = text.split("\n")
-        current_y = y
+        living_particles = []
 
-        for paragraph in paragraphs:
-            paragraph = paragraph.strip()
+        for particle in self.particles:
+            if particle["life"] > 0:
+                living_particles.append(particle)
 
-            if paragraph == "":
-                current_y += paragraph_gap
-                continue
-
-            words = paragraph.split()
-            lines = []
-            current = ""
-
-            for word in words:
-                test = f"{current} {word}".strip()
-
-                if font.size(test)[0] <= max_width:
-                    current = test
-                else:
-                    if current:
-                        lines.append(current)
-                    current = word
-
-            if current:
-                lines.append(current)
-
-            for line in lines:
-                draw_text(screen, line, font, colour, center_x, current_y, center=True)
-                current_y += font.get_height() + line_gap
-
-            current_y += paragraph_gap
-
-        return current_y
+        self.particles = living_particles
 
     def draw_lesson(self, screen, fonts):
+        page = LESSONS[self.lesson_index]
+
         screen.fill(CREAM)
-        page = self.lesson_pages[self.lesson_index]
 
         draw_text(screen, "Symbols", fonts["title"], DARK, 500, 55, center=True)
         draw_text(screen, "Learn first, then answer symbol quizzes.", fonts["small"], BROWN, 500, 105, center=True)
@@ -206,208 +295,104 @@ class SymbolsChallenge:
         pygame.draw.rect(screen, DARK, card, width=3, border_radius=20)
 
         draw_text(screen, page["heading"], fonts["heading"], BROWN, card.centerx, card.y + 45, center=True)
+        draw_centered_words(screen, page["body"], fonts["body"], DARK, card.centerx, card.y + 115, card.width - 90)
 
-        self.draw_centered_wrapped_text(
-            screen,
-            page["body"],
-            fonts["body"],
-            DARK,
-            card.centerx,
-            card.y + 115,
-            card.width - 90,
-            line_gap=10,
-        )
-
-        draw_text(
-            screen,
-            f"Learning page {self.lesson_index + 1} of {len(self.lesson_pages)}",
-            fonts["small"],
-            DARK_GREY,
-            500,
-            550,
-            center=True,
-        )
+        page_number = "Learning page " + str(self.lesson_index + 1) + " of " + str(len(LESSONS))
+        draw_text(screen, page_number, fonts["small"], DARK_GREY, 500, 550, center=True)
 
         back_button = draw_button(screen, "Back to Map", fonts["body"], 235, 610, 210, 55, GREY)
-        next_text = "Start Quiz" if self.lesson_index == len(self.lesson_pages) - 1 else "Next"
-        next_button = draw_button(screen, next_text, fonts["body"], 555, 610, 210, 55, GREEN, WHITE)
+
+        if self.lesson_index == len(LESSONS) - 1:
+            next_words = "Start Quiz"
+        else:
+            next_words = "Next"
+
+        next_button = draw_button(screen, next_words, fonts["body"], 555, 610, 210, 55, GREEN, WHITE)
 
         return {"back": back_button, "next": next_button}
 
-    def draw_symbol_board(self, screen, fonts):
-        board = pygame.Rect(65, 105, 870, 90)
-        pygame.draw.rect(screen, (230, 244, 225), board, border_radius=18)
-        pygame.draw.rect(screen, DARK, board, width=3, border_radius=18)
+    def draw_quiz(self, screen, fonts):
+        quiz = QUIZZES[self.quiz_index]
 
-        labels = ["Shapla", "Tiger", "Hilsa", "Flag", "Map"]
+        screen.fill(CREAM)
 
-        for i, label in enumerate(labels):
-            x = board.x + 95 + i * 170
-            unlocked = i < len(self.unlocked_symbols)
+        draw_text(screen, "Symbols", fonts["title"], DARK, 500, 35, center=True)
+        draw_symbol_board(screen, fonts, self.unlocked_count)
 
-            fill = GREEN if unlocked else (210, 210, 210)
-            pygame.draw.circle(screen, fill, (x, board.y + 45), 30)
-            pygame.draw.circle(screen, DARK, (x, board.y + 45), 30, 2)
+        page_number = "Quiz page " + str(self.quiz_index + 1) + " of " + str(len(QUIZZES))
+        draw_text(screen, page_number, fonts["small"], DARK_GREY, 500, 200, center=True)
 
-            text = label if unlocked else "?"
-            draw_text(screen, text, fonts["tiny"], DARK, x, board.y + 45, center=True)
-
-    
-
-    def draw_option_card(self, screen, fonts, text, rect):
-        mouse_pos = pygame.mouse.get_pos()
-        hovered = rect.collidepoint(mouse_pos)
-
-        fill = (255, 245, 210) if hovered else WHITE
-
-        pygame.draw.rect(screen, fill, rect, border_radius=16)
-        pygame.draw.rect(screen, GREEN if hovered else DARK, rect, width=3, border_radius=16)
-
-        self.draw_centered_wrapped_text(
-            screen,
-            text,
-            fonts["small"],
-            DARK,
-            rect.centerx,
-            rect.y + 18,
-            rect.width - 20,
-            line_gap=4,
-            paragraph_gap=0,
-        )
-
-    def draw_question_panel(self, screen, fonts, quiz):
-    
         panel = pygame.Rect(80, 225, 840, 150)
         pygame.draw.rect(screen, WHITE, panel, border_radius=18)
         pygame.draw.rect(screen, DARK, panel, width=3, border_radius=18)
 
-        draw_text(
-            screen,
-            quiz["heading"],
-            fonts["heading"],
-            BROWN,
-            panel.centerx,
-            panel.y + 38,
-            center=True,
-        )
+        draw_text(screen, quiz["heading"], fonts["heading"], BROWN, panel.centerx, panel.y + 38, center=True)
+        draw_centered_words(screen, quiz["question"], fonts["body"], DARK, panel.centerx, panel.y + 90, panel.width - 80)
 
-        self.draw_centered_wrapped_text(
-            screen,
-            quiz["question"],
-            fonts["body"],
-            DARK,
-            panel.centerx,
-            panel.y + 90,
-            panel.width - 80,
-            line_gap=8,
-            paragraph_gap=0,
-        )
+        option_buttons = {}
+        hovered_option = None
 
+        for i in range(len(quiz["options"])):
+            option = quiz["options"][i]
+            rect = pygame.Rect(95 + i * 178, 410, 160, 90)
 
-    def draw_puzzle(self, screen, fonts):
-        screen.fill(CREAM)
+            draw_option_card(screen, fonts, option, rect)
+            option_buttons[option] = rect
 
-        draw_text(screen, "Symbols", fonts["title"], DARK, 500, 35, center=True)
+            if rect.collidepoint(pygame.mouse.get_pos()):
+                hovered_option = option
 
-        self.draw_symbol_board(screen, fonts)
+        draw_hover_photo(screen, fonts, hovered_option)
 
-        if self.completed:
-            final_card = pygame.Rect(115, 230, 770, 230)
-            pygame.draw.rect(screen, WHITE, final_card, border_radius=20)
-            pygame.draw.rect(screen, DARK, final_card, width=3, border_radius=20)
+        if self.feedback != "":
+            if hovered_option is None:
+                message_y = 525
+            else:
+                message_y = 385
 
-            draw_text(
-                screen,
-                "Symbols complete",
-                fonts["heading"],
-                BROWN,
-                final_card.centerx,
-                final_card.y + 55,
-                center=True,
-            )
+            draw_centered_words(screen, self.feedback, fonts["small"], BROWN, 500, message_y, 780)
 
-            self.draw_centered_wrapped_text(
-                screen,
-                "You completed the symbols section. Symbols help people remember a place, its nature, its stories, and its identity.",
-                fonts["body"],
-                DARK,
-                final_card.centerx,
-                final_card.y + 120,
-                final_card.width - 90,
-                line_gap=10,
-            )
-
-            self.draw_particles(screen)
-
-            back_button = draw_button(screen, "Back to Map", fonts["body"], 190, 615, 210, 50, GREY)
-            reset_button = draw_button(screen, "Reset", fonts["body"], 430, 615, 150, 50, YELLOW)
-            done_button = draw_button(screen, "Stitch Quilt Section", fonts["body"], 610, 615, 270, 50, GREEN, WHITE)
-
-            return {
-                "cards": {},
-                "back": back_button,
-                "reset": reset_button,
-                "done": done_button,
-            }
-
-        quiz = self.quiz_pages[self.current_quiz]
-
-        draw_text(
-            screen,
-            f"Quiz page {self.current_quiz + 1} of {len(self.quiz_pages)}",
-            fonts["small"],
-            DARK_GREY,
-            500,
-            200,
-            center=True,
-        )
-
-        self.draw_question_panel(screen, fonts, quiz)
-
-        card_rects = {}
-
-        start_x = 95
-        start_y = 410
-        card_w = 160
-        card_h = 90
-        gap = 18
-
-        for i, option in enumerate(quiz["options"]):
-            x = start_x + i * (card_w + gap)
-            rect = pygame.Rect(x, start_y, card_w, card_h)
-
-            self.draw_option_card(screen, fonts, option, rect)
-
-            card_rects[option] = rect
-
-        if self.feedback:
-            self.draw_centered_wrapped_text(
-                screen,
-                self.feedback,
-                fonts["small"],
-                BROWN,
-                500,
-                525,
-                780,
-                line_gap=6,
-            )
-
-        self.draw_particles(screen)
+        draw_particles(screen, self.particles)
 
         back_button = draw_button(screen, "Back to Map", fonts["body"], 190, 615, 210, 50, GREY)
         reset_button = draw_button(screen, "Reset", fonts["body"], 430, 615, 150, 50, YELLOW)
 
-        return {
-            "cards": card_rects,
-            "back": back_button,
-            "reset": reset_button,
-            "done": None,
-        }
+        return {"cards": option_buttons, "back": back_button, "reset": reset_button, "done": None}
+
+    def draw_complete(self, screen, fonts):
+        screen.fill(CREAM)
+
+        draw_text(screen, "Symbols", fonts["title"], DARK, 500, 35, center=True)
+        draw_symbol_board(screen, fonts, self.unlocked_count)
+
+        final_card = pygame.Rect(115, 230, 770, 230)
+        pygame.draw.rect(screen, WHITE, final_card, border_radius=20)
+        pygame.draw.rect(screen, DARK, final_card, width=3, border_radius=20)
+
+        draw_text(screen, "Symbols complete", fonts["heading"], BROWN, final_card.centerx, final_card.y + 55, center=True)
+
+        final_message = (
+            "You completed the symbols section. Symbols help people remember a place, "
+            "its nature, its stories, and its identity."
+        )
+        draw_centered_words(screen, final_message, fonts["body"], DARK, final_card.centerx, final_card.y + 120, final_card.width - 90)
+
+        draw_particles(screen, self.particles)
+
+        back_button = draw_button(screen, "Back to Map", fonts["body"], 190, 615, 210, 50, GREY)
+        reset_button = draw_button(screen, "Reset", fonts["body"], 430, 615, 150, 50, YELLOW)
+        done_button = draw_button(screen, "Stitch Quilt Section", fonts["body"], 610, 615, 270, 50, GREEN, WHITE)
+
+        return {"cards": {}, "back": back_button, "reset": reset_button, "done": done_button}
 
     def draw(self, screen, fonts):
         if self.mode == "lesson":
             return self.draw_lesson(screen, fonts)
-        return self.draw_puzzle(screen, fonts)
+
+        if self.completed:
+            return self.draw_complete(screen, fonts)
+
+        return self.draw_quiz(screen, fonts)
 
     def handle_click(self, mouse_pos, buttons):
         if self.mode == "lesson":
@@ -415,12 +400,10 @@ class SymbolsChallenge:
                 return "back"
 
             if buttons["next"].collidepoint(mouse_pos):
-                if self.lesson_index < len(self.lesson_pages) - 1:
+                if self.lesson_index < len(LESSONS) - 1:
                     self.lesson_index += 1
-                    self.message = self.lesson_pages[self.lesson_index]["body"]
                 else:
-                    self.mode = "puzzle"
-                    self.feedback = ""
+                    self.mode = "quiz"
 
             return None
 
@@ -432,31 +415,28 @@ class SymbolsChallenge:
             return None
 
         if self.completed:
-            if buttons["done"] is not None and buttons["done"].collidepoint(mouse_pos):
+            if buttons["done"].collidepoint(mouse_pos):
                 return "complete"
             return None
 
-        quiz = self.quiz_pages[self.current_quiz]
+        quiz = QUIZZES[self.quiz_index]
 
-        for option, rect in buttons["cards"].items():
+        for option in buttons["cards"]:
+            rect = buttons["cards"][option]
+
             if rect.collidepoint(mouse_pos):
                 if option == quiz["answer"]:
-                    self.add_success_particles(rect.center)
-                    self.unlocked_symbols.append(quiz["answer"])
+                    self.add_particles(rect.center)
                     self.feedback = quiz["note"]
+                    self.unlocked_count += 1
+                    self.quiz_index += 1
 
-                    self.current_quiz += 1
-
-                    if self.current_quiz >= len(self.quiz_pages):
+                    if self.quiz_index == len(QUIZZES):
                         self.completed = True
                     else:
                         self.feedback = ""
-
                 else:
-                    self.feedback = (
-                        f"Good try. {option} is not the correct answer for this page. "
-                        "Read the clue again and choose another option."
-                    )
+                    self.feedback = "Good try. " + option + " is not the correct answer. Try again."
 
                 return None
 
