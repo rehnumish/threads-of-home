@@ -216,6 +216,40 @@ def draw_option_card(screen, fonts, option, rect):
     draw_centered_words(screen, option, fonts["small"], DARK, rect.centerx, rect.y + 18, rect.width - 20)
 
 
+def draw_flag_card(screen, option, rect):
+    mouse_pos = pygame.mouse.get_pos()
+
+    if rect.collidepoint(mouse_pos):
+        fill = (255, 245, 210)
+        outline = GREEN
+    else:
+        fill = WHITE
+        outline = DARK
+
+    pygame.draw.rect(screen, fill, rect, border_radius=16)
+    pygame.draw.rect(screen, outline, rect, width=3, border_radius=16)
+
+    image = load_symbol_image(option, rect.width - 20, rect.height - 20)
+
+    if image is not None:
+        image_rect = image.get_rect(center=rect.center)
+        screen.blit(image, image_rect)
+
+
+def flag_country_name(option):
+    if option == "Bangladesh Flag":
+        return "Bangladesh"
+    if option == "Japan Flag":
+        return "Japan"
+    if option == "Pakistan Flag":
+        return "Pakistan"
+    if option == "India Flag":
+        return "India"
+    if option == "Nepal Flag":
+        return "Nepal"
+    return "that country"
+
+
 def draw_hover_photo(screen, fonts, option):
     if option is None:
         return
@@ -336,13 +370,18 @@ class SymbolsChallenge:
             option = quiz["options"][i]
             rect = pygame.Rect(95 + i * 178, 410, 160, 90)
 
-            draw_option_card(screen, fonts, option, rect)
+            if quiz["heading"] == "National Flag":
+                draw_flag_card(screen, option, rect)
+            else:
+                draw_option_card(screen, fonts, option, rect)
+
             option_buttons[option] = rect
 
             if rect.collidepoint(pygame.mouse.get_pos()):
                 hovered_option = option
 
-        draw_hover_photo(screen, fonts, hovered_option)
+        if quiz["heading"] != "National Flag":
+            draw_hover_photo(screen, fonts, hovered_option)
 
         if self.feedback != "":
             if hovered_option is None:
@@ -436,7 +475,11 @@ class SymbolsChallenge:
                     else:
                         self.feedback = ""
                 else:
-                    self.feedback = "Good try. " + option + " is not the correct answer. Try again."
+                    if quiz["heading"] == "National Flag":
+                        country = flag_country_name(option)
+                        self.feedback = "Good try. That is the flag of " + country + ". Try again."
+                    else:
+                        self.feedback = "Good try. " + option + " is not the correct answer. Try again."
 
                 return None
 
