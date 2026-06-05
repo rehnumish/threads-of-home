@@ -1,6 +1,7 @@
 """Food challenge for Threads of Home."""
 
 import random
+import webbrowser
 import pygame
 
 from settings import CREAM, DARK, BROWN, WHITE, GREEN, YELLOW, GREY, DARK_GREY, ORANGE, RED
@@ -19,6 +20,7 @@ class FoodChallenge:
                     "Food is a way to show care. When someone visits, families often offer food "
                     "to make them feel welcome."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Bangladeshi_cuisine",
             },
             {
                 "heading": "Rice and Fish Nation",
@@ -26,6 +28,7 @@ class FoodChallenge:
                     "Bangladesh has many rivers, wetlands, ponds, and farming areas. "
                     "Because of this, rice and fish became a big part of everyday food."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Bangladeshi_cuisine",
             },
             {
                 "heading": "A Meal Has Balance",
@@ -34,6 +37,7 @@ class FoodChallenge:
                     "Fish adds flavour. Achar adds a sharp taste. Mishti and pitha connect food "
                     "with celebration and family memory."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Bengali_cuisine",
             },
             {
                 "heading": "Now Build the Meal",
@@ -41,6 +45,7 @@ class FoodChallenge:
                     "Now you will build a Bangladeshi family meal. Choose the food photo, "
                     "then click the matching place on the table."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Bangladeshi_cuisine",
             },
         ]
 
@@ -192,16 +197,17 @@ class FoodChallenge:
         page_text = "Learning page " + str(self.lesson_index + 1) + " of " + str(len(self.lesson_pages))
         draw_text(screen, page_text, fonts["small"], DARK_GREY, 500, 525, center=True)
 
-        back_button = draw_button(screen, "Back to Map", fonts["body"], 235, 600, 210, 55, GREY)
+        back_button = draw_button(screen, "Back to Map", fonts["body"], 130, 600, 190, 55, GREY)
+        wiki_button = draw_button(screen, "Wikipedia", fonts["body"], 390, 600, 180, 55, YELLOW)
 
         if self.lesson_index == len(self.lesson_pages) - 1:
             next_text = "Start Challenge"
         else:
             next_text = "Next"
 
-        next_button = draw_button(screen, next_text, fonts["body"], 555, 600, 210, 55, GREEN, WHITE)
+        next_button = draw_button(screen, next_text, fonts["body"], 650, 600, 190, 55, GREEN, WHITE)
 
-        return {"back": back_button, "next": next_button}
+        return {"back": back_button, "wiki": wiki_button, "next": next_button}
 
     def draw_zone(self, screen, fonts, zone):
         rect = zone["rect"]
@@ -316,6 +322,11 @@ class FoodChallenge:
         if self.mode == "lesson":
             if buttons["back"].collidepoint(mouse_pos):
                 return "back"
+
+            if buttons["wiki"].collidepoint(mouse_pos):
+                page = self.lesson_pages[self.lesson_index]
+                webbrowser.open(page["wiki"], new=2, autoraise=False)
+                return None
 
             if buttons["next"].collidepoint(mouse_pos):
                 if self.lesson_index < len(self.lesson_pages) - 1:

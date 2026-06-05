@@ -6,6 +6,7 @@ into the correct glowing areas.
 """
 import math
 import random
+import webbrowser
 import pygame
 
 from settings import (
@@ -19,6 +20,39 @@ class FestivalChallenge:
     """A guided Pohela Boishakh scene-building puzzle."""
 
     def __init__(self):
+        self.lesson_pages = [
+            {
+                "heading": "Alpana and Dhol",
+                "body": (
+                    "Pohela Boishakh is the Bengali New Year. Many celebrations begin by making a space feel welcoming. "
+                    "Alpana is handpainted floor art made with white patterns, flowers, circles, and traditional designs. "
+                    "It decorates the courtyard and invites people into the celebration. The dhol is a traitional drum that brings rhythm, "
+                    "energy, and togetherness. It's sound helps people feel that the festival has begun."
+                ),
+                "wiki": "https://en.wikipedia.org/wiki/Pohela_Boishakh",
+            },
+            {
+                "heading": "Mongol Shovajatra",
+                "body": (
+                    "Mongol Shovajatra means a procession for well-being. It is a colourful Bengali New Year procession "
+                    "where people walk together with handmade masks, animals, birds, and folk art. The masks are not only decoration. "
+                    "They show courage, imagination, and hope for a better year. This procession celebrates community, creativity, "
+                    "and standing together."
+                ),
+                "wiki": "https://en.wikipedia.org/wiki/Mangal_Shobhajatra",
+            },
+            {
+                "heading": "Pitha and Red-White Outfit",
+                "body": (
+                    "Food and clothing also carry festival memory. Pitha is a traditional Bengali snack often made and shared "
+                    "with family during special times. Sharing food makes the celebration feel warm and welcoming. Red and white "
+                    "outfits are strongly connected with Pohela Boishakh. Wearing these colours helps people feel part of the "
+                    "same joyful Bengali New Year tradition."
+                ),
+                "wiki": "https://en.wikipedia.org/wiki/Pitha",
+            },
+        ]
+
         self.scene_zones = {
             "courtyard": {
                 "label": "Courtyard",
@@ -103,8 +137,10 @@ class FestivalChallenge:
 
     def reset(self):
         """Reset the puzzle to its starting state."""
+        self.mode = "lesson"
+        self.lesson_index = 0
         self.placed_items = {}
-        self.message = "Drag each festival photo to its matching place."
+        self.message = self.lesson_pages[0]["body"]
         self.completed = False
         self.success_particles = []
         self.mistake_flash = 0
@@ -117,6 +153,35 @@ class FestivalChallenge:
         if self.shuffled_items == self.items:
             first_item = self.shuffled_items.pop(0)
             self.shuffled_items.append(first_item)
+
+    def draw_lesson(self, screen, fonts):
+        screen.fill(CREAM)
+        page = self.lesson_pages[self.lesson_index]
+
+        draw_text(screen, "Pohela Boishakh", fonts["title"], DARK, 500, 55, center=True)
+        draw_text(screen, "Learn first, then build the celebration.", fonts["small"], BROWN, 500, 105, center=True)
+
+        card = pygame.Rect(105, 145, 790, 380)
+        pygame.draw.rect(screen, WHITE, card, border_radius=20)
+        pygame.draw.rect(screen, DARK, card, width=3, border_radius=20)
+
+        draw_text(screen, page["heading"], fonts["heading"], BROWN, card.centerx, card.y + 45, center=True)
+        draw_wrapped_text(screen, page["body"], fonts["body"], DARK, card.x + 45, card.y + 105, card.width - 90, 10)
+
+        page_text = "Learning page " + str(self.lesson_index + 1) + " of " + str(len(self.lesson_pages))
+        draw_text(screen, page_text, fonts["small"], DARK_GREY, 500, 550, center=True)
+
+        back_button = draw_button(screen, "Back to Map", fonts["body"], 130, 610, 190, 55, GREY)
+        wiki_button = draw_button(screen, "Wikipedia", fonts["body"], 390, 610, 180, 55, YELLOW)
+
+        if self.lesson_index == len(self.lesson_pages) - 1:
+            next_text = "Start Challenge"
+        else:
+            next_text = "Next"
+
+        next_button = draw_button(screen, next_text, fonts["body"], 650, 610, 190, 55, GREEN, WHITE)
+
+        return {"back": back_button, "wiki": wiki_button, "next": next_button}
 
     def item_rect(self, item, animation_tick):
         """Return the current rectangle for an item, including gentle bobbing animation."""
@@ -227,6 +292,9 @@ class FestivalChallenge:
 
     def draw(self, screen, fonts):
         """Draw the challenge and return clickable rectangles."""
+        if self.mode == "lesson":
+            return self.draw_lesson(screen, fonts)
+
         animation_tick = pygame.time.get_ticks() // 16
 
         screen.fill(CREAM)
@@ -273,6 +341,25 @@ class FestivalChallenge:
 
     def handle_click(self, mouse_pos, buttons):
         """Handle click interactions. Return 'complete', 'back', or None."""
+        if self.mode == "lesson":
+            if buttons["back"].collidepoint(mouse_pos):
+                return "back"
+
+            if buttons["wiki"].collidepoint(mouse_pos):
+                page = self.lesson_pages[self.lesson_index]
+                webbrowser.open(page["wiki"], new=2, autoraise=False)
+                return None
+
+            if buttons["next"].collidepoint(mouse_pos):
+                if self.lesson_index < len(self.lesson_pages) - 1:
+                    self.lesson_index += 1
+                    self.message = self.lesson_pages[self.lesson_index]["body"]
+                else:
+                    self.mode = "puzzle"
+                    self.message = "Drag each festival photo to its matching place."
+
+            return None
+
         if buttons["back"].collidepoint(mouse_pos):
             return "back"
 
@@ -316,7 +403,7 @@ class FestivalChallenge:
                         self.completed = True
                         self.message = (
                             "You built the Pohela Boishakh scene. It is made from art, music, "
-                            "procession, food, clothing, and family memory."
+                            "procession, food, clothing, and family memory. Now, stitch the quilt to reveal the festival section. "
                         )
                 else:
                     self.mistake_flash = 15

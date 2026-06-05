@@ -1,6 +1,7 @@
 """Rhythm challenge for Threads of Home."""
 
 import random
+import webbrowser
 import pygame
 
 from settings import CREAM, DARK, BROWN, WHITE, GREEN, YELLOW, GREY, DARK_GREY, PURPLE, ORANGE
@@ -19,6 +20,7 @@ class RhythmChallenge:
                     "connected to rivers, poetry, village life, faith, protest, and identity. A song can tell us "
                     "what people value and what they remember."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Music_of_Bangladesh",
             },
             {
                 "heading": "River and Folk Songs",
@@ -27,6 +29,7 @@ class RhythmChallenge:
                     "when a boatman is alone on the water with nothing but sky above him, he sings Bhatiyali. The word itself comes from bhata: "
                     "the current that carries the boat downstream. These songs are slow, longing, and full of open space, the way only a man alone on a river can feel." 
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Bhatiyali",
             },
             {
                 "heading": "Poets and Traditions (Rabindra Sangeet)",
@@ -34,6 +37,7 @@ class RhythmChallenge:
                     "Rabindranath Tagore wrote songs that felt like the land itself was speaking: the monsoon rain, the mustard fields, the fishermen at dusk. "
                     "His music, called Rabindra Sangeet, became woven into Bengali life so deeply that Bangladesh chose one of his songs as its national anthem.\n\n"
                     ),
+                "wiki": "https://en.wikipedia.org/wiki/Rabindra_Sangeet",
             },
             {
                 "heading": "Nazrul Geeti",
@@ -42,6 +46,7 @@ class RhythmChallenge:
                     " Nazrul for years because of his radical literary expressions. "
                     "His songs swung between fury and tenderness, revolution and devotion, love and grief. He is called the the Rebel Poet and his music, Nazrul Geeti, carries that electricity even now.\n\n"
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Nazrul_Geeti",
             },
             {
                 "heading": "Lalon Songs",
@@ -49,6 +54,7 @@ class RhythmChallenge:
                     "Deep in the heart of Kushtia, a man with no caste, no religion, and no last name sat by the river and sang. Lalon Shah asked questions nobody dared to ask: who are you really, beneath"
                     "your religion and your name? His songs, called Baul songs, spread from village to village, carried by wandering singers with one-stringed instruments and open hearts. He belonged to everyone and no one."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Lalon",
             }
 
         ]
@@ -77,6 +83,21 @@ class RhythmChallenge:
         ]
 
         self.options = ["Bhatiyali", "Rabindra Sangeet", "Nazrul Geeti", "Lalon Geeti"]
+        self.option_images = {
+            "Bhatiyali": "bhatiyali.jpg",
+            "Rabindra Sangeet": "Rabindranath.webp",
+            "Nazrul Geeti": "nazrul.jpg",
+            "Lalon Geeti": "lalon.jpg",
+        }
+        self.images = {}
+
+        for option in self.options:
+            try:
+                filename = self.option_images[option]
+                self.images[option] = pygame.image.load("assets/rhythm/" + filename).convert_alpha()
+            except (pygame.error, FileNotFoundError):
+                self.images[option] = None
+
         self.reset()
 
     def reset(self):
@@ -87,6 +108,12 @@ class RhythmChallenge:
         self.message = self.lesson_pages[0]["body"]
         self.success_particles = []
         self.completed_answers = []
+        self.shuffled_options = self.options[:]
+        random.shuffle(self.shuffled_options)
+
+        if self.shuffled_options == self.options:
+            first_option = self.shuffled_options.pop(0)
+            self.shuffled_options.append(first_option)
 
     def update(self):
         for p in self.success_particles:
@@ -111,6 +138,17 @@ class RhythmChallenge:
     def draw_particles(self, screen):
         for p in self.success_particles:
             pygame.draw.circle(screen, p["colour"], (int(p["x"]), int(p["y"])), 4)
+
+    def draw_image_in_box(self, screen, image, box):
+        if image is None:
+            return
+
+        scale = min(box.width / image.get_width(), box.height / image.get_height())
+        new_width = int(image.get_width() * scale)
+        new_height = int(image.get_height() * scale)
+        image = pygame.transform.smoothscale(image, (new_width, new_height))
+        image_rect = image.get_rect(center=box.center)
+        screen.blit(image, image_rect)
 
     def draw_centered_wrapped_text(self, screen, text, font, colour, center_x, y, max_width, line_gap=8):
         words = text.split()
@@ -161,11 +199,12 @@ class RhythmChallenge:
             center=True,
         )
 
-        back_button = draw_button(screen, "Back to Map", fonts["body"], 235, 610, 210, 55, GREY)
+        back_button = draw_button(screen, "Back to Map", fonts["body"], 130, 610, 190, 55, GREY)
+        wiki_button = draw_button(screen, "Wikipedia", fonts["body"], 390, 610, 180, 55, YELLOW)
         next_text = "Start Challenge" if self.lesson_index == len(self.lesson_pages) - 1 else "Next"
-        next_button = draw_button(screen, next_text, fonts["body"], 555, 610, 210, 55, GREEN, WHITE)
+        next_button = draw_button(screen, next_text, fonts["body"], 650, 610, 190, 55, GREEN, WHITE)
 
-        return {"back": back_button, "next": next_button}
+        return {"back": back_button, "wiki": wiki_button, "next": next_button}
 
     def draw_instruction_panel(self, screen, fonts):
         panel = pygame.Rect(65, 70, 870, 105)
@@ -174,7 +213,11 @@ class RhythmChallenge:
 
         heading = "Gathering complete" if self.completed else f"Rhythm step {self.current_step + 1} of {len(self.steps)}"
         draw_text(screen, heading, fonts["small"], BROWN, panel.x + 20, panel.y + 12)
-        draw_wrapped_text(screen, self.message, fonts["small"], DARK, panel.x + 20, panel.y + 42, panel.width - 40)
+
+        message_y = panel.y + 42
+        for line in self.message.split("\n"):
+            draw_wrapped_text(screen, line, fonts["small"], DARK, panel.x + 20, message_y, panel.width - 40)
+            message_y += fonts["small"].get_height() + 8
 
     def draw_music_scene(self, screen, fonts):
         scene = pygame.Rect(80, 195, 840, 220)
@@ -191,9 +234,25 @@ class RhythmChallenge:
             pygame.draw.circle(screen, ORANGE, (x, scene.y + 120), 22)
             pygame.draw.rect(screen, PURPLE, (x - 18, scene.y + 142, 36, 45), border_radius=8)
 
-        for i in range(self.current_step):
-            note_x = scene.x + 200 + i * 140
-            note_y = scene.y + 90 - (i % 2) * 18
+        for i, answer in enumerate(self.completed_answers):
+            image = self.images[answer]
+            image_box = pygame.Rect(scene.x + 180 + i * 130, scene.y + 70, 100, 70)
+
+            pygame.draw.rect(screen, WHITE, image_box, border_radius=12)
+            pygame.draw.rect(screen, DARK, image_box, width=2, border_radius=12)
+
+            if image is not None:
+                self.draw_image_in_box(screen, image, image_box)
+
+        note_places = [
+            (scene.x + 155, scene.y + 72),
+            (scene.x + 315, scene.y + 62),
+            (scene.x + 485, scene.y + 62),
+            (scene.x + 650, scene.y + 72),
+        ]
+
+        for i in range(len(self.completed_answers)):
+            note_x, note_y = note_places[i]
             draw_text(screen, "♪", fonts["heading"], DARK, note_x, note_y, center=True)
 
     def draw_choice_card(self, screen, fonts, text, rect):
@@ -206,7 +265,15 @@ class RhythmChallenge:
         pygame.draw.rect(screen, fill, rect, border_radius=16)
         pygame.draw.rect(screen, GREEN if hovered else DARK, rect, width=3, border_radius=16)
 
-        self.draw_centered_wrapped_text(screen, text, fonts["small"], DARK, rect.centerx, rect.y + 24, rect.width - 20)
+        image = self.images[text]
+        image_box = pygame.Rect(rect.x + 10, rect.y + 8, rect.width - 20, 55)
+
+        if image is not None:
+            self.draw_image_in_box(screen, image, image_box)
+        else:
+            draw_text(screen, "Missing photo", fonts["tiny"], DARK_GREY, image_box.centerx, image_box.centery, center=True)
+
+        self.draw_centered_wrapped_text(screen, text, fonts["tiny"], DARK, rect.centerx, rect.y + 68, rect.width - 20)
 
         if done:
             draw_text(screen, "DONE", fonts["tiny"], GREEN, rect.centerx, rect.bottom - 12, center=True)
@@ -222,7 +289,7 @@ class RhythmChallenge:
         gap = 20
         card_width = 200
 
-        for i, option in enumerate(self.options):
+        for i, option in enumerate(self.shuffled_options):
             rect = pygame.Rect(start_x + i * (card_width + gap), 455, card_width, 95)
             card_rects[option] = rect
             self.draw_choice_card(screen, fonts, option, rect)
@@ -247,6 +314,11 @@ class RhythmChallenge:
         if self.mode == "lesson":
             if buttons["back"].collidepoint(mouse_pos):
                 return "back"
+
+            if buttons["wiki"].collidepoint(mouse_pos):
+                page = self.lesson_pages[self.lesson_index]
+                webbrowser.open(page["wiki"], new=2, autoraise=False)
+                return None
 
             if buttons["next"].collidepoint(mouse_pos):
                 if self.lesson_index < len(self.lesson_pages) - 1:
@@ -285,11 +357,14 @@ class RhythmChallenge:
                             "You completed the rhythm gathering. Click on the quilt to unfold song section on nokshi katha."
                         )
                     else:
-                        self.message = f"Correct. {current['note']} Next: {self.steps[self.current_step]['prompt']}"
+                        self.message = (
+                            "Correct. " + current["note"] + "\n"
+                            "Next: " + self.steps[self.current_step]["prompt"]
+                        )
                 else:
                     self.message = (
-                        f"Good try. {option} is not the answer for this clue. "
-                        "Read the clue again and choose the song tradition it describes."
+                        "Good try. " + option + " is not the answer for this clue.\n"
+                        "Clue: " + current["prompt"]
                     )
 
                 return None

@@ -1,6 +1,7 @@
 """River challenge for Threads of Home."""
 
 import random
+import webbrowser
 import pygame
 
 from settings import CREAM, DARK, BROWN, WHITE, GREEN, YELLOW, GREY, DARK_GREY
@@ -19,6 +20,7 @@ class RiverChallenge:
                     "Rivers help shape where people live, how people travel, how crops grow, and how families "
                     "find food. Many stories, songs, and memories are connected to river life."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/List_of_rivers_of_Bangladesh",
             },
             {
                 "heading": "The Lifelines of Bangladesh",
@@ -29,6 +31,7 @@ class RiverChallenge:
                     "to the sea. The restless Jamuna river shifts and changes course every year, reshaping the "
                     "land and the lives of the people who live on its banks."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Padma_River",
             },
             {
                 "heading": "Padma, Jamuna, Meghna",
@@ -36,10 +39,16 @@ class RiverChallenge:
                     "In this challenge, you will follow three major river names: Padma, Jamuna, and Meghna. "
                     "Think about rivers as paths that connect people, food, travel, land, and culture."
                 ),
+                "wiki": "https://en.wikipedia.org/wiki/Jamuna_River_(Bangladesh)",
             },
         ]
 
         self.options = ["Padma", "Jamuna", "Meghna"]
+        self.river_wikis = {
+            "Padma": "https://en.wikipedia.org/wiki/Padma_River",
+            "Jamuna": "https://en.wikipedia.org/wiki/Jamuna_River_(Bangladesh)",
+            "Meghna": "https://en.wikipedia.org/wiki/Meghna_River",
+        }
         self.river_photo = None
         self.card_photos = {}
         self.reset()
@@ -169,11 +178,20 @@ class RiverChallenge:
             center=True,
         )
 
-        back_button = draw_button(screen, "Back to Map", fonts["body"], 235, 610, 210, 55, GREY)
+        back_button = draw_button(screen, "Back to Map", fonts["small"], 60, 610, 150, 55, GREY)
+        padma_button = draw_button(screen, "Padma Wiki", fonts["small"], 230, 610, 140, 55, YELLOW)
+        jamuna_button = draw_button(screen, "Jamuna Wiki", fonts["small"], 390, 610, 150, 55, YELLOW)
+        meghna_button = draw_button(screen, "Meghna Wiki", fonts["small"], 560, 610, 150, 55, YELLOW)
         next_text = "Start Challenge" if self.lesson_index == len(self.lesson_pages) - 1 else "Next"
-        next_button = draw_button(screen, next_text, fonts["body"], 555, 610, 210, 55, GREEN, WHITE)
+        next_button = draw_button(screen, next_text, fonts["small"], 735, 610, 170, 55, GREEN, WHITE)
 
-        return {"back": back_button, "next": next_button}
+        return {
+            "back": back_button,
+            "padma": padma_button,
+            "jamuna": jamuna_button,
+            "meghna": meghna_button,
+            "next": next_button,
+        }
 
     def draw_river_scene(self, screen, fonts):
         """Draw a river story board instead of a random boat journey."""
@@ -325,6 +343,18 @@ class RiverChallenge:
         if self.mode == "lesson":
             if buttons["back"].collidepoint(mouse_pos):
                 return "back"
+
+            if buttons["padma"].collidepoint(mouse_pos):
+                webbrowser.open(self.river_wikis["Padma"], new=2, autoraise=False)
+                return None
+
+            if buttons["jamuna"].collidepoint(mouse_pos):
+                webbrowser.open(self.river_wikis["Jamuna"], new=2, autoraise=False)
+                return None
+
+            if buttons["meghna"].collidepoint(mouse_pos):
+                webbrowser.open(self.river_wikis["Meghna"], new=2, autoraise=False)
+                return None
 
             if buttons["next"].collidepoint(mouse_pos):
                 if self.lesson_index < len(self.lesson_pages) - 1:

@@ -1,6 +1,7 @@
 """Symbols challenge for Threads of Home."""
 
 import random
+import webbrowser
 import pygame
 
 from settings import CREAM, DARK, BROWN, WHITE, GREEN, YELLOW, GREY, DARK_GREY, ORANGE, RED
@@ -15,6 +16,7 @@ LESSONS = [
             "A flower, animal, fish, flag, or bird can remind people of a country. "
             "Symbols help people remember a place, even when they live far away from it."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/National_symbols_of_Bangladesh",
     },
     {
         "heading": "National Flower",
@@ -22,6 +24,7 @@ LESSONS = [
             "The Shapla, or White Water Lily, is the national flower of Bangladesh. "
             "It grows in ponds, lakes, and rivers. It shows purity, simplicity, and natural beauty."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/Nymphaea_nouchali",
     },
     {
         "heading": "National Animal",
@@ -29,6 +32,7 @@ LESSONS = [
             "The Royal Bengal Tiger is the national animal of Bangladesh. "
             "It is connected with the Sundarbans and represents strength, courage, and pride."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/Bengal_tiger",
     },
     {
         "heading": "National Fish",
@@ -36,6 +40,7 @@ LESSONS = [
             "The Hilsa, or Ilish, is the national fish of Bangladesh. "
             "It is found in rivers like the Padma and Meghna and is loved by many Bangladeshi families."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/Ilish",
     },
     {
         "heading": "National Bird",
@@ -43,6 +48,7 @@ LESSONS = [
             "The Doyel, or Oriental Magpie Robin, is the national bird of Bangladesh. "
             "It is a small black and white bird known for its sweet song."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/Oriental_magpie-robin",
     },
     {
         "heading": "National Flag",
@@ -51,6 +57,7 @@ LESSONS = [
             "The green shows the land and nature. The red circle shows the rising sun and the sacrifice "
             "of people during the 1971 Liberation War."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/Flag_of_Bangladesh",
     },
     {
         "heading": "Your Mission",
@@ -58,6 +65,7 @@ LESSONS = [
             "You will answer one quiz page at a time. "
             "Choose the correct option to unlock that symbol on the board."
         ),
+        "wiki": "https://en.wikipedia.org/wiki/National_symbols_of_Bangladesh",
     },
 ]
 
@@ -72,7 +80,7 @@ QUIZZES = [
     },
     {
         "heading": "Royal Bengal Tiger",
-        "question": "Which animal is the Royal Bengal Tiger?",
+        "question": "Which one is the national animal of Bangladesh?",
         "answer": "Royal Bengal Tiger",
         "options": ["Elephant", "Royal Bengal Tiger", "Deer", "Lion", "Crocodile"],
         "note": "Correct. The Royal Bengal Tiger is connected with the Sundarbans and strength.",
@@ -334,16 +342,17 @@ class SymbolsChallenge:
         page_number = "Learning page " + str(self.lesson_index + 1) + " of " + str(len(LESSONS))
         draw_text(screen, page_number, fonts["small"], DARK_GREY, 500, 550, center=True)
 
-        back_button = draw_button(screen, "Back to Map", fonts["body"], 235, 610, 210, 55, GREY)
+        back_button = draw_button(screen, "Back to Map", fonts["body"], 130, 610, 190, 55, GREY)
+        wiki_button = draw_button(screen, "Wikipedia", fonts["body"], 390, 610, 180, 55, YELLOW)
 
         if self.lesson_index == len(LESSONS) - 1:
             next_words = "Start Quiz"
         else:
             next_words = "Next"
 
-        next_button = draw_button(screen, next_words, fonts["body"], 555, 610, 210, 55, GREEN, WHITE)
+        next_button = draw_button(screen, next_words, fonts["body"], 650, 610, 190, 55, GREEN, WHITE)
 
-        return {"back": back_button, "next": next_button}
+        return {"back": back_button, "wiki": wiki_button, "next": next_button}
 
     def draw_quiz(self, screen, fonts):
         quiz = QUIZZES[self.quiz_index]
@@ -437,6 +446,11 @@ class SymbolsChallenge:
         if self.mode == "lesson":
             if buttons["back"].collidepoint(mouse_pos):
                 return "back"
+
+            if buttons["wiki"].collidepoint(mouse_pos):
+                page = LESSONS[self.lesson_index]
+                webbrowser.open(page["wiki"], new=2, autoraise=False)
+                return None
 
             if buttons["next"].collidepoint(mouse_pos):
                 if self.lesson_index < len(LESSONS) - 1:
