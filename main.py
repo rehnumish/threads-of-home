@@ -10,7 +10,6 @@ from settings import (
 from quilt import update_reveal_progress
 from screens import draw_menu, draw_intro, draw_map, draw_quilt_screen, draw_final_screen
 from challenges.festival import FestivalChallenge
-from challenges.placeholder import draw_placeholder_challenge
 from challenges.food import FoodChallenge
 from challenges.river import RiverChallenge
 from challenges.rhythm import RhythmChallenge
@@ -222,7 +221,15 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
 
-                if current_state == FOOD:
+                if current_state == FESTIVAL:
+                    result = festival_challenge.handle_release(mouse_pos, buttons)
+
+                    if result == "complete":
+                        patches["festival"] = True
+                        reveal_progress["festival"] = 0.0
+                        current_state = QUILT
+
+                elif current_state == FOOD:
                     result = food_challenge.handle_release(mouse_pos, buttons)
 
                     if result == "complete":

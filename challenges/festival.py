@@ -2,15 +2,8 @@
 
 
 The player builds a Pohela Boishakh celebration scene by placing cultural items
-into the correct glowing areas. The challenge uses:
-- sequential puzzle steps
-- click-to-select and click-to-place interaction
-- animated item bobbing
-- pulsing target areas
-- success particles
-- teaching feedback after each action
+into the correct glowing areas. 
 """
-
 import math
 import random
 import pygame
@@ -56,99 +49,88 @@ class FestivalChallenge:
 
         self.items = [
             {
-                "name": "Alpana",
+                "name": "Handpainted design (Alpana)",
                 "zone": "courtyard",
                 "home": (105, 520),
-                "colour": WHITE,
+                "image": "alpana.webp",
                 "note": "Alpana is decorative floor art. In this scene it belongs in the courtyard, where it welcomes people into the celebration.",
             },
             {
-                "name": "Dhol",
+                "name": "Drum (Dhol)",
                 "zone": "music",
                 "home": (255, 520),
-                "colour": YELLOW,
+                "image": "Dhol.jpg",
                 "note": "The dhol is a drum. It belongs in the music corner because rhythm helps create the energy of the festival.",
             },
             {
                 "name": "Mask",
                 "zone": "procession",
                 "home": (405, 520),
-                "colour": RED,
+                "image": "mask.jpg",
                 "note": "Colourful masks are connected with Mangal Shobhajatra, a festive procession for Bengali New Year.",
             },
             {
                 "name": "Pitha",
                 "zone": "food",
                 "home": (555, 520),
-                "colour": ORANGE,
+                "image": "pitha2.jpg",
                 "note": "Pitha belongs on the food table. Food connects festivals with family, memory, and sharing.",
             },
             {
                 "name": "Red-White Outfit",
                 "zone": "outfit",
                 "home": (705, 520),
-                "colour": PINK,
+                "image": "outfit.jpg",
                 "note": "Red and white clothing is commonly associated with Pohela Boishakh celebration outfits.",
             },
             {
-                "name": "Random Toy",
+                "name": "Barbie",
                 "zone": "decoy",
                 "home": (855, 520),
-                "colour": BLUE,
+                "image": "barbie.jpg",
                 "note": "This might be fun, but it does not help complete this Pohela Boishakh scene.",
             },
         ]
 
-        self.steps = [
-            {
-                "zone": "courtyard",
-                "clue": "First, prepare the entrance. Bengali New Year celebrations often use decorative floor patterns to welcome people. Which item should go in the courtyard?",
-            },
-            {
-                "zone": "music",
-                "clue": "Now add sound. A festival feels alive when rhythm leads the crowd. Which item belongs in the music corner?",
-            },
-            {
-                "zone": "procession",
-                "clue": "Next, build the procession. Mangal Shobhajatra is known for colourful symbolic masks and folk art. Which item belongs there?",
-            },
-            {
-                "zone": "food",
-                "clue": "Now make the celebration feel like family. Traditional sweets and snacks are shared during festive gatherings. What goes on the food table?",
-            },
-            {
-                "zone": "outfit",
-                "clue": "Finally, dress for the day. Red and white are strongly associated with Pohela Boishakh. What belongs on the outfit stand?",
-            },
-        ]
+        self.images = {}
+        for item in self.items:
+            try:
+                self.images[item["name"]] = pygame.image.load("assets/festival/" + item["image"]).convert_alpha()
+            except (pygame.error, FileNotFoundError):
+                self.images[item["name"]] = None
 
         self.reset()
 
     def reset(self):
         """Reset the puzzle to its starting state."""
-        self.current_step = 0
-        self.selected_item = None
         self.placed_items = {}
-        self.message = self.steps[0]["clue"]
+        self.message = "Drag each festival photo to its matching place."
         self.completed = False
         self.success_particles = []
         self.mistake_flash = 0
         self.last_completed_item = None
+        self.dragging_item = None
+        self.drag_offset = (0, 0)
+        self.shuffled_items = self.items[:]
+        random.shuffle(self.shuffled_items)
 
-    def current_zone_key(self):
-        """Return the zone key required for the current puzzle step."""
-        if self.current_step >= len(self.steps):
-            return None
-        return self.steps[self.current_step]["zone"]
+        if self.shuffled_items == self.items:
+            first_item = self.shuffled_items.pop(0)
+            self.shuffled_items.append(first_item)
 
     def item_rect(self, item, animation_tick):
         """Return the current rectangle for an item, including gentle bobbing animation."""
-        home_x, home_y = item["home"]
-
         # Placed items move to the centre of their assigned zone.
         if item["name"] in self.placed_items:
             zone_rect = self.scene_zones[item["zone"]]["rect"]
             return pygame.Rect(zone_rect.centerx - 55, zone_rect.centery - 35, 110, 70)
+
+        if item in self.shuffled_items:
+            tray_index = self.shuffled_items.index(item)
+            home_x = 105 + tray_index * 150
+            home_y = 520
+        else:
+            home_x, home_y = item["home"]
 
         bob = int(5 * math.sin(animation_tick * 0.06 + home_x))
         return pygame.Rect(home_x, home_y + bob, 120, 72)
@@ -188,16 +170,9 @@ class FestivalChallenge:
     def draw_zone(self, screen, zone_key, zone, fonts, animation_tick):
         """Draw a target zone in the festival scene."""
         rect = zone["rect"]
-        required_zone = self.current_zone_key()
-        is_active = zone_key == required_zone and not self.completed
 
         pygame.draw.rect(screen, zone["colour"], rect, border_radius=16)
-
-        if is_active:
-            pulse = int(4 + 3 * abs(math.sin(animation_tick * 0.08)))
-            pygame.draw.rect(screen, GREEN, rect.inflate(pulse, pulse), width=5, border_radius=18)
-        else:
-            pygame.draw.rect(screen, BROWN, rect, width=3, border_radius=16)
+        pygame.draw.rect(screen, BROWN, rect, width=3, border_radius=16)
 
         draw_text(screen, zone["label"], fonts["tiny"], DARK, rect.centerx, rect.y + 16, center=True)
 
@@ -206,61 +181,35 @@ class FestivalChallenge:
             pygame.draw.circle(screen, BROWN, (x, rect.bottom - 18), 3)
 
     def draw_item_icon(self, screen, item, rect, fonts, animation_tick):
-        """Draw a simple shape-based item icon."""
-        selected = self.selected_item == item["name"]
+        """Draw a photo card."""
+        mouse_pos = pygame.mouse.get_pos()
+        hovered = rect.collidepoint(mouse_pos)
         placed = item["name"] in self.placed_items
 
-        bg_colour = item["colour"]
-        if placed:
-            bg_colour = tuple(max(0, c - 20) for c in bg_colour)
+        pygame.draw.rect(screen, WHITE, rect, border_radius=14)
+        pygame.draw.rect(screen, GREEN if hovered else DARK, rect, width=4, border_radius=14)
 
-        pygame.draw.rect(screen, bg_colour, rect, border_radius=14)
-        pygame.draw.rect(screen, GREEN if selected else DARK, rect, width=4, border_radius=14)
+        image = self.images[item["name"]]
+        if image is not None:
+            image_area = pygame.Rect(rect.x + 8, rect.y + 8, rect.width - 16, rect.height - 16)
+            scale = min(image_area.width / image.get_width(), image_area.height / image.get_height())
+            new_width = int(image.get_width() * scale)
+            new_height = int(image.get_height() * scale)
+            image = pygame.transform.smoothscale(image, (new_width, new_height))
+            image_x = image_area.centerx - image.get_width() // 2
+            image_y = image_area.centery - image.get_height() // 2
+            screen.blit(image, (image_x, image_y))
+        else:
+            draw_text(screen, "Missing", fonts["tiny"], DARK_GREY, rect.centerx, rect.centery, center=True)
 
-        name = item["name"]
-
-        if name == "Alpana":
-            pygame.draw.circle(screen, RED, rect.center, 20)
-            pygame.draw.circle(screen, WHITE, rect.center, 9)
-            for dx, dy in [(0, -28), (0, 28), (-28, 0), (28, 0)]:
-                pygame.draw.circle(screen, RED, (rect.centerx + dx, rect.centery + dy), 6)
-
-        elif name == "Dhol":
-            pygame.draw.ellipse(screen, BROWN, (rect.centerx - 35, rect.centery - 24, 70, 22))
-            pygame.draw.rect(screen, BROWN, (rect.centerx - 35, rect.centery - 14, 70, 38))
-            pygame.draw.ellipse(screen, YELLOW, (rect.centerx - 35, rect.centery + 12, 70, 22))
-            pygame.draw.line(screen, DARK, (rect.centerx - 45, rect.centery - 25), (rect.centerx + 45, rect.centery + 25), 3)
-
-        elif name == "Mask":
-            pygame.draw.ellipse(screen, ORANGE, (rect.centerx - 30, rect.centery - 30, 60, 58))
-            pygame.draw.circle(screen, DARK, (rect.centerx - 14, rect.centery - 8), 5)
-            pygame.draw.circle(screen, DARK, (rect.centerx + 14, rect.centery - 8), 5)
-            pygame.draw.arc(screen, DARK, (rect.centerx - 18, rect.centery + 4, 36, 18), 0, 3.14, 3)
-
-        elif name == "Pitha":
-            pygame.draw.circle(screen, WHITE, rect.center, 26)
-            pygame.draw.circle(screen, ORANGE, rect.center, 18)
-            pygame.draw.circle(screen, WHITE, rect.center, 7)
-
-        elif name == "Red-White Outfit":
-            pygame.draw.polygon(screen, WHITE, [
-                (rect.centerx, rect.centery - 30),
-                (rect.centerx - 27, rect.centery + 28),
-                (rect.centerx + 27, rect.centery + 28),
-            ])
-            pygame.draw.line(screen, RED, (rect.centerx - 20, rect.centery), (rect.centerx + 20, rect.centery), 5)
-
-        elif name == "Random Toy":
-            pygame.draw.circle(screen, PURPLE, rect.center, 24)
-            pygame.draw.circle(screen, WHITE, (rect.centerx - 8, rect.centery - 5), 5)
-            pygame.draw.circle(screen, WHITE, (rect.centerx + 8, rect.centery - 5), 5)
-            pygame.draw.rect(screen, DARK, (rect.centerx - 16, rect.centery + 10, 32, 5))
-
-        label_colour = DARK if item["colour"] != BLUE else WHITE
         if placed:
             draw_text(screen, "PLACED", fonts["tiny"], GREEN, rect.centerx, rect.y + 9, center=True)
-        else:
-            draw_text(screen, name, fonts["tiny"], label_colour, rect.centerx, rect.bottom - 16, center=True)
+        elif hovered:
+            label = pygame.Rect(rect.x, rect.bottom - 24, rect.width, 24)
+            label_surface = pygame.Surface((label.width, label.height), pygame.SRCALPHA)
+            pygame.draw.rect(label_surface, (255, 255, 255, 220), label_surface.get_rect(), border_radius=8)
+            screen.blit(label_surface, label.topleft)
+            draw_text(screen, item["name"], fonts["tiny"], DARK, label.centerx, label.centery, center=True)
 
     def draw_instruction_panel(self, screen, fonts):
         """Draw the teaching/clue panel."""
@@ -271,7 +220,7 @@ class FestivalChallenge:
         if self.completed:
             heading = "Scene complete"
         else:
-            heading = f"Puzzle step {self.current_step + 1} of {len(self.steps)}"
+            heading = "Festival scene"
 
         draw_text(screen, heading, fonts["small"], BROWN, panel.x + 20, panel.y + 12)
         draw_wrapped_text(screen, self.message, fonts["small"], DARK, panel.x + 20, panel.y + 40, panel.width - 40)
@@ -294,11 +243,14 @@ class FestivalChallenge:
         tray = pygame.Rect(60, 495, 880, 100)
         pygame.draw.rect(screen, (230, 211, 184), tray, border_radius=18)
         pygame.draw.rect(screen, BROWN, tray, width=3, border_radius=18)
-        draw_text(screen, "Item tray: click an item, then click the glowing area.", fonts["tiny"], DARK, 500, 505, center=True)
+        draw_text(screen, "Item tray: drag each photo to its matching place.", fonts["tiny"], DARK, 500, 505, center=True)
 
         item_rects = {}
-        for item in self.items:
+        for item in self.shuffled_items:
             rect = self.item_rect(item, animation_tick)
+            if item["name"] == self.dragging_item:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                rect = pygame.Rect(mouse_x - self.drag_offset[0], mouse_y - self.drag_offset[1], 120, 72)
             item_rects[item["name"]] = rect
             self.draw_item_icon(screen, item, rect, fonts, animation_tick)
 
@@ -333,53 +285,46 @@ class FestivalChallenge:
                 return "complete"
             return None
 
-        # Select an item from the tray or already visible objects.
-        for item in self.items:
+        for item in self.shuffled_items:
             if item["name"] in self.placed_items:
                 continue
 
             if buttons["items"][item["name"]].collidepoint(mouse_pos):
-                self.selected_item = item["name"]
-
-                if item["zone"] == "decoy":
-                    self.message = item["note"] + " Try using the clue to find a cultural item."
-                else:
-                    self.message = item["note"] + " Now place it in the glowing area if it matches the clue."
+                self.dragging_item = item["name"]
+                rect = buttons["items"][item["name"]]
+                self.drag_offset = (mouse_pos[0] - rect.x, mouse_pos[1] - rect.y)
                 return None
 
-        # Place the selected item into a zone.
-        if self.selected_item is not None:
-            for zone_key, zone_rect in buttons["zones"].items():
-                if zone_rect.collidepoint(mouse_pos):
-                    selected_data = next(item for item in self.items if item["name"] == self.selected_item)
-                    required_zone = self.current_zone_key()
+        return None
 
-                    if selected_data["zone"] == required_zone and zone_key == required_zone:
-                        self.placed_items[self.selected_item] = zone_key
-                        self.last_completed_item = self.selected_item
-                        self.add_success_particles(zone_rect.center)
+    def handle_release(self, mouse_pos, buttons):
+        if self.dragging_item is None:
+            return None
 
-                        self.current_step += 1
-                        self.selected_item = None
+        selected_data = next(item for item in self.items if item["name"] == self.dragging_item)
+        self.dragging_item = None
 
-                        if self.current_step >= len(self.steps):
-                            self.completed = True
-                            self.message = (
-                                "You built the Pohela Boishakh scene. Notice how the celebration is not one object: "
-                                "it is made from art, music, procession, food, clothing, and family memory."
-                            )
-                        else:
-                            self.message = self.steps[self.current_step]["clue"]
+        for zone_key, zone_rect in buttons["zones"].items():
+            if zone_rect.collidepoint(mouse_pos):
+                if selected_data["zone"] == zone_key:
+                    self.placed_items[selected_data["name"]] = zone_key
+                    self.last_completed_item = selected_data["name"]
+                    self.add_success_particles(zone_rect.center)
+                    self.message = selected_data["note"]
 
-                    else:
-                        self.mistake_flash = 15
+                    if len(self.placed_items) == 5:
+                        self.completed = True
                         self.message = (
-                            "Good try. This puzzle is teaching the meaning, not testing you. "
-                            f"{selected_data['note']} Look again at the glowing area and clue."
+                            "You built the Pohela Boishakh scene. It is made from art, music, "
+                            "procession, food, clothing, and family memory."
                         )
+                else:
+                    self.mistake_flash = 15
+                    self.message = "Good try. " + selected_data["note"]
 
-                    return None
+                return None
 
+        self.message = "Drag each festival photo to its matching place."
         return None
 
     def update(self):

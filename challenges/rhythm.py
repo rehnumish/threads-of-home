@@ -38,7 +38,8 @@ class RhythmChallenge:
             {
                 "heading": "Nazrul Geeti",
                 "body": (
-                    "Bangladesh named Kazi Nazrul Islam its national poet, because his voice still sounds like the voice of people who refuse to give up. "
+                    "Bangladesh named Kazi Nazrul Islam its national poet, because his voice still sounds like the voice of people who refuse to give up. The British colonial government jailed and tormented"
+                    " Nazrul for years because of his radical literary expressions. "
                     "His songs swung between fury and tenderness, revolution and devotion, love and grief. He is called the the Rebel Poet and his music, Nazrul Geeti, carries that electricity even now.\n\n"
                 ),
             },

@@ -31,7 +31,10 @@ quilt.py
 challenges/
     __init__.py
     festival.py
-    placeholder.py
+    food.py
+    river.py
+    rhythm.py
+    symbols.py
 ```
 
 ## Design idea
