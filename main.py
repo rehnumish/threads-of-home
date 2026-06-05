@@ -222,7 +222,15 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
 
-                if current_state == RIVER:
+                if current_state == FOOD:
+                    result = food_challenge.handle_release(mouse_pos, buttons)
+
+                    if result == "complete":
+                        patches["food"] = True
+                        reveal_progress["food"] = 0.0
+                        current_state = QUILT
+
+                elif current_state == RIVER:
                     result = river_challenge.handle_release(mouse_pos, buttons)
 
                     if result == "complete":
