@@ -44,7 +44,7 @@ class RhythmChallenge:
                 "body": (
                     "Bangladesh named Kazi Nazrul Islam its national poet, because his voice still sounds like the voice of people who refuse to give up. The British colonial government jailed and tormented"
                     " Nazrul for years because of his radical literary expressions. "
-                    "His songs swung between fury and tenderness, revolution and devotion, love and grief. He is called the the Rebel Poet and his music, Nazrul Geeti, carries that electricity even now.\n\n"
+                    "His songs swung between fury and tenderness, revolution and devotion, love and grief. He is called the Rebel Poet and his music, Nazrul Geeti, carries that electricity even now.\n\n"
                 ),
                 "wiki": "https://en.wikipedia.org/wiki/Nazrul_Geeti",
             },
@@ -122,7 +122,11 @@ class RhythmChallenge:
             p["dy"] += 0.12
             p["life"] -= 1
 
-        self.success_particles = [p for p in self.success_particles if p["life"] > 0]
+        living_particles = []
+        for particle in self.success_particles:
+            if particle["life"] > 0:
+                living_particles.append(particle)
+        self.success_particles = living_particles
 
     def add_success_particles(self, centre):
         for _ in range(24):
@@ -156,7 +160,8 @@ class RhythmChallenge:
         current = ""
 
         for word in words:
-            test = f"{current} {word}".strip()
+            test = current + " " + word
+            test = test.strip()
             if font.size(test)[0] <= max_width:
                 current = test
             else:
@@ -191,7 +196,7 @@ class RhythmChallenge:
 
         draw_text(
             screen,
-            f"Learning page {self.lesson_index + 1} of {len(self.lesson_pages)}",
+            "Learning page " + str(self.lesson_index + 1) + " of " + str(len(self.lesson_pages)),
             fonts["small"],
             DARK_GREY,
             500,
@@ -211,7 +216,10 @@ class RhythmChallenge:
         pygame.draw.rect(screen, WHITE, panel, border_radius=16)
         pygame.draw.rect(screen, DARK, panel, width=3, border_radius=16)
 
-        heading = "Gathering complete" if self.completed else f"Rhythm step {self.current_step + 1} of {len(self.steps)}"
+        if self.completed:
+            heading = "Gathering complete"
+        else:
+            heading = "Rhythm step " + str(self.current_step + 1) + " of " + str(len(self.steps))
         draw_text(screen, heading, fonts["small"], BROWN, panel.x + 20, panel.y + 12)
 
         message_y = panel.y + 42
@@ -234,7 +242,8 @@ class RhythmChallenge:
             pygame.draw.circle(screen, ORANGE, (x, scene.y + 120), 22)
             pygame.draw.rect(screen, PURPLE, (x - 18, scene.y + 142, 36, 45), border_radius=8)
 
-        for i, answer in enumerate(self.completed_answers):
+        for i in range(len(self.completed_answers)):
+            answer = self.completed_answers[i]
             image = self.images[answer]
             image_box = pygame.Rect(scene.x + 180 + i * 130, scene.y + 70, 100, 70)
 
@@ -289,7 +298,8 @@ class RhythmChallenge:
         gap = 20
         card_width = 200
 
-        for i, option in enumerate(self.shuffled_options):
+        for i in range(len(self.shuffled_options)):
+            option = self.shuffled_options[i]
             rect = pygame.Rect(start_x + i * (card_width + gap), 455, card_width, 95)
             card_rects[option] = rect
             self.draw_choice_card(screen, fonts, option, rect)

@@ -23,7 +23,8 @@ def draw_wrapped_text(screen, text, font, colour, x, y, max_width, line_gap=8):
     current_y = y
 
     for word in words:
-        test_line = f"{line} {word}".strip()
+        test_line = line + " " + word
+        test_line = test_line.strip()
         if font.size(test_line)[0] <= max_width:
             line = test_line
         else:
@@ -42,7 +43,10 @@ def draw_button(screen, text, font, x, y, w, h, base_colour=LIGHT_BROWN, text_co
 
     colour = base_colour
     if rect.collidepoint(mouse_pos):
-        colour = tuple(min(c + 25, 255) for c in base_colour)
+        brighter_colour = []
+        for number in base_colour:
+            brighter_colour.append(min(number + 25, 255))
+        colour = tuple(brighter_colour)
 
     pygame.draw.rect(screen, colour, rect, border_radius=14)
     pygame.draw.rect(screen, DARK, rect, width=3, border_radius=14)

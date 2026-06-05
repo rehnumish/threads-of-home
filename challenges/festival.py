@@ -26,8 +26,8 @@ class FestivalChallenge:
                 "body": (
                     "Pohela Boishakh is the Bengali New Year. Many celebrations begin by making a space feel welcoming. "
                     "Alpana is handpainted floor art made with white patterns, flowers, circles, and traditional designs. "
-                    "It decorates the courtyard and invites people into the celebration. The dhol is a traitional drum that brings rhythm, "
-                    "energy, and togetherness. It's sound helps people feel that the festival has begun."
+                    "It decorates the courtyard and invites people into the celebration. The dhol is a traditional drum that brings rhythm, "
+                    "energy, and togetherness. Its sound helps people feel that the festival has begun."
                 ),
                 "wiki": "https://en.wikipedia.org/wiki/Pohela_Boishakh",
             },
@@ -220,7 +220,11 @@ class FestivalChallenge:
             particle["dy"] += 0.15
             particle["life"] -= 1
 
-        self.success_particles = [p for p in self.success_particles if p["life"] > 0]
+        living_particles = []
+        for particle in self.success_particles:
+            if particle["life"] > 0:
+                living_particles.append(particle)
+        self.success_particles = living_particles
 
     def draw_particles(self, screen):
         """Draw success particles."""
@@ -388,8 +392,15 @@ class FestivalChallenge:
         if self.dragging_item is None:
             return None
 
-        selected_data = next(item for item in self.items if item["name"] == self.dragging_item)
+        selected_data = None
+        for item in self.items:
+            if item["name"] == self.dragging_item:
+                selected_data = item
+
         self.dragging_item = None
+
+        if selected_data is None:
+            return None
 
         for zone_key, zone_rect in buttons["zones"].items():
             if zone_rect.collidepoint(mouse_pos):

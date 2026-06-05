@@ -73,7 +73,11 @@ class RiverChallenge:
             particle["dy"] += 0.12
             particle["life"] -= 1
 
-        self.success_particles = [p for p in self.success_particles if p["life"] > 0]
+        living_particles = []
+        for particle in self.success_particles:
+            if particle["life"] > 0:
+                living_particles.append(particle)
+        self.success_particles = living_particles
 
     def add_success_particles(self, centre):
         for _ in range(24):
@@ -96,7 +100,8 @@ class RiverChallenge:
         current = ""
 
         for word in words:
-            test = f"{current} {word}".strip()
+            test = current + " " + word
+            test = test.strip()
             if font.size(test)[0] <= max_width:
                 current = test
             else:
@@ -118,7 +123,6 @@ class RiverChallenge:
 
         try:
             image = pygame.image.load("assets/river/river.webp").convert_alpha()
-            image = pygame.transform.smoothscale(image, (360, 260))
             self.river_photo = image
             return image
         except (pygame.error, FileNotFoundError):
@@ -161,7 +165,13 @@ class RiverChallenge:
             if photo is not None:
                 pygame.draw.rect(screen, (225, 240, 245), photo_rect, border_radius=16)
                 pygame.draw.rect(screen, DARK, photo_rect, width=3, border_radius=16)
-                screen.blit(photo, photo_rect.topleft)
+                scale = min(photo_rect.width / photo.get_width(), photo_rect.height / photo.get_height())
+                new_width = int(photo.get_width() * scale)
+                new_height = int(photo.get_height() * scale)
+                photo = pygame.transform.smoothscale(photo, (new_width, new_height))
+                photo_x = photo_rect.centerx - photo.get_width() // 2
+                photo_y = photo_rect.centery - photo.get_height() // 2
+                screen.blit(photo, (photo_x, photo_y))
         else:
             self.draw_centered_wrapped_text(
                 screen, page["body"], fonts["body"], DARK,
@@ -170,7 +180,7 @@ class RiverChallenge:
 
         draw_text(
             screen,
-            f"Learning page {self.lesson_index + 1} of {len(self.lesson_pages)}",
+            "Learning page " + str(self.lesson_index + 1) + " of " + str(len(self.lesson_pages)),
             fonts["small"],
             DARK_GREY,
             500,
@@ -304,7 +314,8 @@ class RiverChallenge:
         target_rects = self.draw_river_scene(screen, fonts)
 
         card_rects = {}
-        for i, option in enumerate(self.shuffled_options):
+        for i in range(len(self.shuffled_options)):
+            option = self.shuffled_options[i]
             rect = self.choice_home_rect(i)
 
             if option == self.dragging_option:

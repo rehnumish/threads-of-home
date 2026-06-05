@@ -84,7 +84,7 @@ class FoodChallenge:
 
         self.items = [
             {
-                "name": "Bhaat",
+                "name": "Rice",
                 "zone": "main_plate",
                 "image": "bhaat.png",
                 "note": "Bhaat means rice. It is often the base of the meal.",
@@ -96,13 +96,13 @@ class FoodChallenge:
                 "note": "Fish connects the meal to rivers and daily life.",
             },
             {
-                "name": "Achar",
+                "name": "Pickle",
                 "zone": "pickle_bowl",
                 "image": "achar.png",
                 "note": "Achar means pickles. It adds a sharp tangy taste.",
             },
             {
-                "name": "Mishti",
+                "name": "Mishti (traditional sweets)",
                 "zone": "sweet_plate",
                 "image": "mishti.png",
                 "note": "Mishti means sweets. Families share sweets for joy and hospitality.",
